@@ -22,11 +22,13 @@ public class MainActivity extends AppCompatActivity {
         SEditText editText = (SEditText) findViewById(R.id.edit_text);
         SButton replaceButton = (SButton) findViewById(R.id.replace_button);
 
-        Stream<String> sRed = redButton.sClicked.map(u -> "red");
-        Stream<String> sGreen = greenButton.sClicked.map(u -> "green");
+        Stream<String> sRed = redButton.sClicked().map(u -> "red");
+        Stream<String> sGreen = greenButton.sClicked().map(u -> "green");
         Stream<String> sColor = sRed.orElse(sGreen);
-        Stream<String> stream = replaceButton.sClicked.snapshot(editText.text);
-        Cell<String> cell = sColor.orElse(stream).hold("Hello!");
+        editText.setTextStream(sColor);
+
+        Stream<String> stream = replaceButton.sClicked().snapshot(editText.text());
+        Cell<String> cell = stream.hold("Hello!");
         helloText.setTextCell(cell);
     }
 }

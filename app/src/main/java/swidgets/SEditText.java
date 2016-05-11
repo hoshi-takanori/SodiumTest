@@ -9,13 +9,15 @@ import android.util.AttributeSet;
 import android.widget.EditText;
 
 import nz.sodium.Cell;
+import nz.sodium.Listener;
 import nz.sodium.Stream;
 import nz.sodium.StreamSink;
 
 public class SEditText extends EditText {
-    private final StreamSink<String> sUserChangesSink = new StreamSink<>();
-    public final Stream<String> sUserChanges = sUserChangesSink;
-    public final Cell<String> text = sUserChanges.hold("");
+    private StreamSink<String> sUserChangesSink;
+    private Cell<String> text;
+    private Listener listener;
+    private boolean updateFlag;
 
     public SEditText(Context context) {
         super(context);
@@ -39,6 +41,8 @@ public class SEditText extends EditText {
     }
 
     private void init() {
+        sUserChangesSink = new StreamSink<>();
+
         this.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -50,8 +54,49 @@ public class SEditText extends EditText {
 
             @Override
             public void afterTextChanged(Editable s) {
-                sUserChangesSink.send(getText().toString());
+                if (!updateFlag) {
+                    sUserChangesSink.send(getText().toString());
+                }
             }
         });
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        if (listener != null) {
+            listener.unlisten();
+        }
+        super.onDetachedFromWindow();
+    }
+
+    public void setTextStream(Stream<String> sText) {
+        if (listener != null) {
+            listener.unlisten();
+        }
+
+        if (sText != null) {
+            text = sUserChangesSink.orElse(sText).hold(getText().toString());
+            listener = sText.listen(text -> {
+                post(() -> {
+                    updateFlag = true;
+                    setText(text);
+                    updateFlag = false;
+                });
+            });
+        } else {
+            text = sUserChangesSink.hold(getText().toString());
+            listener = null;
+        }
+    }
+
+    public Stream<String> sUserChanges() {
+        return sUserChangesSink;
+    }
+
+    public Cell<String> text() {
+        if (text == null) {
+            setTextStream(null);
+        }
+        return text;
     }
 }
