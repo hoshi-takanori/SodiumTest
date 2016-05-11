@@ -10,6 +10,7 @@
 
     <swidgets.STextView
         android:id="@+id/hello_text"
+        android:textSize="20sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
@@ -22,6 +23,17 @@
     <swidgets.SButton
         android:id="@+id/green_button"
         android:text="Green"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <swidgets.SEditText
+        android:id="@+id/edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <swidgets.SButton
+        android:id="@+id/replace_button"
+        android:text="Replace"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 

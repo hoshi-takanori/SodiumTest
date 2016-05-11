@@ -16,7 +16,8 @@ import nz.sodium.Transaction;
 import nz.sodium.Unit;
 
 public class SButton extends Button {
-    public final Stream<Unit> sClicked = new StreamSink<>();
+    private final StreamSink<Unit> sClickedSink = new StreamSink<>();
+    public final Stream<Unit> sClicked = sClickedSink;
     private Listener listener;
 
     public SButton(Context context) {
@@ -41,7 +42,7 @@ public class SButton extends Button {
     }
 
     private void init() {
-        setOnClickListener(view -> ((StreamSink<Unit>) sClicked).send(Unit.UNIT));
+        setOnClickListener(view -> sClickedSink.send(Unit.UNIT));
     }
 
     @Override
